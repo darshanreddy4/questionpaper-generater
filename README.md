@@ -44,6 +44,17 @@ questions, add an AI key: each teacher or school can use their own, or the opera
 Use single when one school or college hosts its own copy. Use multi when you run one service for several schools
 and bill them.
 
+### Switching off individual sign-up (multi mode)
+
+`EXAMFORGE_ALLOW_INDIVIDUAL_SIGNUP` is an on/off setting for the "Create account" tab.
+
+- **Default:** on, so anyone can use "Create account" and get a private workspace of their own.
+- **Turning it off:** set `EXAMFORGE_ALLOW_INDIVIDUAL_SIGNUP=false` in `.env` and restart. The "Create account" tab
+  disappears from the login page and the server refuses individual sign-ups. Use this if you want only schools to
+  join, not individual teachers.
+- **What keeps working:** "Register a school" and "Join with code" still work, because school registration has its
+  own setting (`EXAMFORGE_ALLOW_SCHOOL_SIGNUP`, also on by default).
+
 ## Multi-school service
 
 ```bash

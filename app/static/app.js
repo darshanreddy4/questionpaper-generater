@@ -179,6 +179,7 @@
     const joinCode = (location.hash.match(/^#\/join\/([\w-]+)/) || [])[1] || '';
     const tabs = [['in', 'Sign in']];
     if (multi) {
+      if (cfg.allow_individual_signup) tabs.push(['solo', 'Create account']);
       if (cfg.allow_school_signup) tabs.push(['school', 'Register a school']);
       tabs.push(['join', 'Join with code']);
     } else if (cfg.allow_registration) tabs.push(['up', 'Create account']);
@@ -188,15 +189,16 @@
       <div class="tabs">${tabs.map(([k, l]) => `<button data-t="${k}">${l}</button>`).join('')}</div>
       <form id="af" class="col" autocomplete="on">
         <label class="f" data-m="join" hidden>Invitation code<input type="text" name="invite_code" autocomplete="off" value="${esc(joinCode)}"></label>
-        <label class="f" data-m="up school join" hidden>Full name<input type="text" name="name" autocomplete="name"></label>
+        <label class="f" data-m="up solo school join" hidden>Full name<input type="text" name="name" autocomplete="name"></label>
         <label class="f" data-m="up school" hidden>School / institution<input type="text" name="organization" autocomplete="organization"></label>
         <label class="f">Email<input type="email" name="email" required autocomplete="username"></label>
-        <label class="f">Password<input type="password" name="password" required minlength="10" autocomplete="current-password"><span class="muted small" data-m="up school join" hidden>At least 10 characters.</span></label>
+        <label class="f">Password<input type="password" name="password" required minlength="10" autocomplete="current-password"><span class="muted small" data-m="up solo school join" hidden>At least 10 characters.</span></label>
+        <div class="muted small" data-m="solo" hidden>For individual teachers and tutors who are not part of a school. You get your own private workspace; nobody else can see your papers.</div>
         <div class="muted small" data-m="school" hidden>You will be the administrator of this school and can invite your teachers afterwards.</div>
         <div class="banner bad" id="aerr" hidden></div>
         <button class="btn primary" type="submit" id="asubmit">Sign in</button></form></div></div>`;
     let mode = 'in';
-    const label = { in: 'Sign in', up: 'Create account', school: 'Register school', join: 'Join school' };
+    const label = { in: 'Sign in', up: 'Create account', solo: 'Create account', school: 'Register school', join: 'Join school' };
     const setMode = (m) => {
       mode = m;
       $$('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.t === m));
@@ -214,6 +216,7 @@
       try {
         let body = { email: f.email, password: f.password };
         if (mode !== 'in') body = Object.assign(body, { name: f.name || f.email });
+        if (mode === 'solo') body.individual = true;
         if (mode === 'up') body.organization = f.organization || '';
         if (mode === 'school') body.school_name = f.organization || '';
         if (mode === 'join') body.invite_code = (f.invite_code || '').trim();

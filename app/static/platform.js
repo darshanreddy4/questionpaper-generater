@@ -26,7 +26,7 @@
         <label class="right row small">Month <input type="month" id="pm" value="${esc(month)}" style="width:150px"></label></div></div>`;
       $('#pm', main).onchange = (e) => { month = e.target.value; draw().catch((x) => toast(x.message, 'bad')); };
       $('#plist', main).innerHTML = `<table class="t"><thead><tr><th>School</th><th>Users</th><th>Papers</th><th>Terms</th><th>Tokens</th><th>Total</th><th>Support</th><th></th></tr></thead><tbody>${d.orgs.map((o) =>
-        `<tr><td><b>${esc(o.name)}</b><div class="muted small">${o.is_active ? 'Active' : '<span class="badge bad">suspended</span>'} · since ${when(o.created_at)}</div></td>
+        `<tr><td><b>${esc(o.name)}</b>${o.kind === 'individual' ? ' <span class="badge">individual</span>' : ''}<div class="muted small">${o.is_active ? 'Active' : '<span class="badge bad">suspended</span>'} · since ${when(o.created_at)}</div></td>
         <td>${o.users}</td><td>${o.papers}</td>
         <td class="small">${money(o.terms.platform_fee_monthly, cur)} / month<br>${money(o.terms.price_input_per_million, cur)} in · ${money(o.terms.price_output_per_million, cur)} out per 1M${o.terms.custom ? ' <span class="badge warn">custom</span>' : ''}</td>
         <td>${tok(o.month.platform_tokens)}</td><td><b>${money(o.month.total, cur)}</b></td>

@@ -22,6 +22,7 @@ class RegisterBody(BaseModel):
     organization: str = Field(default="", max_length=200)
     school_name: str = Field(default="", max_length=200)  # multi-school: registers a new school with you as its administrator
     invite_code: str = Field(default="", max_length=100)  # joins an existing school
+    individual: bool = False  # multi-school: a lone teacher opens a personal workspace of one
 
 
 class LoginBody(BaseModel):
@@ -42,7 +43,8 @@ def auth_config(request: Request):
     """Public: lets the sign-in page show the right registration choices."""
     s = get_state(request).settings
     return {"tenancy": s.tenancy, "allow_registration": s.allow_registration,
-            "allow_school_signup": s.allow_school_signup and s.allow_registration}
+            "allow_school_signup": s.allow_school_signup and s.allow_registration,
+            "allow_individual_signup": s.allow_individual_signup and s.allow_registration}
 
 
 @router.post("/register")
@@ -65,6 +67,11 @@ def register(body: RegisterBody, request: Request):
             if org is None:
                 org = tenancy.new_org(db, body.organization or "My School")
             role = "admin" if db.query(User).count() == 0 else "teacher"
+        elif body.individual:
+            if not (cfg.allow_registration and cfg.allow_individual_signup):
+                raise HTTPException(403, "Individual sign-up is closed. Ask your school administrator for an invitation.")
+            who = body.name.strip() or email.split("@")[0]
+            org, role = tenancy.new_org(db, f"{who} (individual)", kind="individual"), "admin"
         else:
             operator = email in cfg.superadmin_emails
             if not (cfg.allow_registration and cfg.allow_school_signup) and not operator:

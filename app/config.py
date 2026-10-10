@@ -66,6 +66,7 @@ class Settings:
     db_pool_size: int
     tenancy: str  # single: one school per deployment | multi: many schools, sign-up by school or invite
     allow_school_signup: bool
+    allow_individual_signup: bool  # multi: a lone teacher or tutor may open a personal workspace
     superadmin_emails: List[str]
     hybrid_writer: bool  # let code write what it can write exactly
     allow_private_ai_urls: bool  # permit customer AI endpoints on private networks (on-prem Ollama/vLLM)
@@ -134,6 +135,7 @@ def load_settings(load_env_file: bool = True) -> Settings:
         db_pool_size=max(1, _int("EXAMFORGE_DB_POOL_SIZE", 10)),
         tenancy="multi" if os.environ.get("EXAMFORGE_TENANCY", "single").lower() == "multi" else "single",
         allow_school_signup=_bool("EXAMFORGE_ALLOW_SCHOOL_SIGNUP", True),
+        allow_individual_signup=_bool("EXAMFORGE_ALLOW_INDIVIDUAL_SIGNUP", True),
         superadmin_emails=[e.strip().lower() for e in os.environ.get("EXAMFORGE_SUPERADMIN_EMAILS", "").split(",") if e.strip()],
         hybrid_writer=_bool("EXAMFORGE_HYBRID_WRITER", True),
         allow_private_ai_urls=_bool("EXAMFORGE_ALLOW_PRIVATE_AI_URLS", False),

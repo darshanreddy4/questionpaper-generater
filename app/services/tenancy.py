@@ -21,8 +21,8 @@ def _hash(code: str) -> str:
     return hashlib.sha256(code.strip().encode()).hexdigest()
 
 
-def new_org(db, name: str) -> Organization:
-    org = Organization(name=name.strip()[:200] or "My School")
+def new_org(db, name: str, kind: str = "school") -> Organization:
+    org = Organization(name=name.strip()[:200] or "My School", kind=kind)
     db.add(org)
     db.flush()
     return org

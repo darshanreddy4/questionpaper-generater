@@ -72,7 +72,8 @@ def make_paper(c, h):
 
 def test_schools_register_separately_and_the_first_user_administers(multi):
     app, c = multi
-    assert c.get("/api/auth/config").json() == {"tenancy": "multi", "allow_registration": True, "allow_school_signup": True}
+    assert c.get("/api/auth/config").json() == {"tenancy": "multi", "allow_registration": True, "allow_school_signup": True,
+                                             "allow_individual_signup": True}
     assert signup(c, "x@a.test").status_code == 422  # neither a school name nor an invitation
     _, a = ok(c, "a@a.test", "Sunrise Public School")
     _, b = ok(c, "b@b.test", "Hillview College")
@@ -268,3 +269,49 @@ def test_a_database_from_before_multi_school_is_adopted_into_one_school(settings
             assert db.query(UsageLog).one().org_id == org_id and db.query(AuditLog).one().org_id == org_id
             assert db.query(AiSetting).one().owner_id == org_id
         assert ensure_default_org(state) is None  # running it again changes nothing
+
+
+# ----------------------------------------------------------------- individual teachers
+
+def solo(c, email, name="Tutor"):
+    return c.post("/api/auth/register", json={"email": email, "password": PW, "name": name, "individual": True})
+
+
+def test_individual_teacher_gets_a_private_workspace_of_one(multi):
+    app, c = multi
+    r = solo(c, "tutor@home.test", "Meera")
+    assert r.status_code == 200, r.text
+    me = r.json()["user"]
+    assert me["role"] == "admin" and me["organization"] == "Meera (individual)"
+    h = {"Authorization": "Bearer " + r.json()["token"]}
+    other, _ = ok(c, "x@other.test", "Other School")
+    mine = make_paper(c, h)
+    assert c.get(f"/api/papers/{mine['id']}", headers=other).status_code == 404
+    assert c.get("/api/papers", headers=other).json()["papers"] == []
+    with app.state.ctx.db.session() as db:
+        assert db.get(Organization, me["org_id"]).kind == "individual"
+
+
+def test_two_individuals_never_share_even_with_the_same_name(multi):
+    app, c = multi
+    a = solo(c, "one@home.test", "Sam").json()
+    b = solo(c, "two@home.test", "Sam").json()
+    assert a["user"]["org_id"] != b["user"]["org_id"]
+
+
+def test_individual_signup_can_be_closed_without_closing_schools(settings):
+    app = create_app(dataclasses.replace(settings, tenancy="multi", allow_individual_signup=False,
+                                         superadmin_emails=[OPERATOR]))
+    with TestClient(app) as c:
+        assert c.get("/api/auth/config").json()["allow_individual_signup"] is False
+        assert solo(c, "tutor@home.test").status_code == 403
+        assert signup(c, "a@a.test", "A School").status_code == 200
+
+
+def test_operator_console_labels_individual_workspaces(multi):
+    app, c = multi
+    solo(c, "tutor@home.test", "Meera")
+    ok(c, "a@a.test", "A School")
+    op, _ = ok(c, OPERATOR)
+    kinds = {o["name"]: o["kind"] for o in c.get("/api/platform/orgs", headers=op).json()["orgs"]}
+    assert kinds["Meera (individual)"] == "individual" and kinds["A School"] == "school"

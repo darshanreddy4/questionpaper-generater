@@ -33,9 +33,9 @@ questions, add an AI key: each teacher or school can use their own, or the opera
 
 | | **Single** (default) | **Multi** (`EXAMFORGE_TENANCY=multi`) |
 |---|---|---|
-| **Login page** | Sign in, Create account | Sign in, Register a school, Join with code. There is no plain Create account tab: every account belongs to a school, made by registering one or joining with a code. |
-| **Who can sign up** | Anyone can create an account (unless registration is disabled). The first user becomes admin; later users become teachers in that one school. | A new school registers itself and its first user becomes that school's admin. Teachers join only with an invitation code from their school admin. |
-| **Number of schools** | One school per install. | Many schools on one install, each fully isolated: its own papers, source files, question bank and users. |
+| **Login page** | Sign in, Create account | Sign in, Create account (for an individual teacher or tutor), Register a school, Join with code |
+| **Who can sign up** | Anyone can create an account (unless registration is disabled). The first user becomes admin; later users become teachers in that one school. | A school registers itself and its first user becomes that school's admin; teachers join with an invitation code from their school admin. A lone teacher or tutor uses Create account and gets a private workspace of one (listed as "individual" to the operator). |
+| **Number of schools** | One school per install. | Many schools and individual teachers on one install, each fully isolated: its own papers, source files, question bank and users. |
 | **Teachers' work** | Private: each teacher sees only their own papers and sources. The admin sees everything. | Shared inside a school: every teacher sees the school's papers, source files and bank. Edits stay with the author or the admin; only the admin can delete source files and bank questions. |
 | **Platform operator** | None. | Accounts in `EXAMFORGE_SUPERADMIN_EMAILS` get a Platform console: onboard schools, set fees and token prices per school, suspend a school, see usage and billing. They cannot see school content. |
 | **Support access** | Not available. | A school admin can grant a time-limited, read-only support view. The operator can then open the school as support, and every item opened is written to the school's audit log. |

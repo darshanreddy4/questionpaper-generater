@@ -36,6 +36,7 @@ class Organization(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=_uuid)
     name: Mapped[str] = mapped_column(String(200))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # a suspended school cannot sign in or generate
+    kind: Mapped[str] = mapped_column(String(16), default="school")  # "individual" = one teacher's own workspace; blank on old rows means school
     # Per-school commercial terms; null means "use the platform default".
     platform_fee_monthly: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     price_input_per_million: Mapped[Optional[float]] = mapped_column(Float, nullable=True)

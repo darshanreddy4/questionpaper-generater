@@ -25,7 +25,7 @@ def _org_json(db, org: Organization, usage: Dict[str, Any], state) -> Dict[str, 
     tokens, charge = usage.get(org.id, (0, 0))
     fee = price["fee"]
     return {
-        "id": org.id, "name": org.name, "is_active": org.is_active, "created_at": org.created_at.isoformat() + "Z",
+        "id": org.id, "name": org.name, "kind": org.kind or "school", "is_active": org.is_active, "created_at": org.created_at.isoformat() + "Z",
         "users": db.query(User).filter(User.org_id == org.id).count(),
         "papers": db.query(Paper).join(User, User.id == Paper.owner_id).filter(User.org_id == org.id).count(),
         "support": support.grant_json(support.active_grant(db, org.id)),

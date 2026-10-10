@@ -20,6 +20,10 @@ python3 -m venv .venv
 The first person to register becomes the administrator. Everything is stored in `./data/` (SQLite) unless
 `EXAMFORGE_DATABASE_URL` points to PostgreSQL.
 
+By default the app runs in single-school mode: the login page offers only "Sign in" and "Create account". For
+"Register a school" and "Join with code", copy `.env.example` to `.env` (git-ignored, one per machine) before starting;
+it turns on multi-school mode. Accounts and papers live in `./data/`, which is not in git, so a new machine starts empty.
+
 Without any AI key the built-in writer produces papers straight from your uploaded sources. For much better
 questions, add an AI key: each teacher or school can use their own, or the operator can supply a platform key.
 

@@ -27,6 +27,23 @@ it turns on multi-school mode. Accounts and papers live in `./data/`, which is n
 Without any AI key the built-in writer produces papers straight from your uploaded sources. For much better
 questions, add an AI key: each teacher or school can use their own, or the operator can supply a platform key.
 
+## Single-school vs multi-school mode
+
+![Single vs multi-school mode](docs/single-vs-multi.png)
+
+| | **Single** (default) | **Multi** (`EXAMFORGE_TENANCY=multi`) |
+|---|---|---|
+| **Login page** | Sign in, Create account | Sign in, Create account, Register a school, Join with code |
+| **Who can sign up** | Anyone can create an account (unless registration is disabled). The first user becomes admin; later users become teachers in that one school. | A new school registers itself and its first user becomes that school's admin. Teachers join only with an invitation code from their school admin. |
+| **Number of schools** | One school per install. | Many schools on one install, each fully isolated: its own papers, source files, question bank and users. |
+| **Teachers' work** | Private: each teacher sees only their own papers and sources. The admin sees everything. | Shared inside a school: every teacher sees the school's papers, source files and bank. Edits stay with the author or the admin; only the admin can delete source files and bank questions. |
+| **Platform operator** | None. | Accounts in `EXAMFORGE_SUPERADMIN_EMAILS` get a Platform console: onboard schools, set fees and token prices per school, suspend a school, see usage and billing. They cannot see school content. |
+| **Support access** | Not available. | A school admin can grant a time-limited, read-only support view. The operator can then open the school as support, and every item opened is written to the school's audit log. |
+| **Same in both modes** | AI key order (teacher key, school key, platform key, built-in writer), paper generation, PDF and Word export, Indian languages, password rules, and sign-up with an invitation code. | *(same)* |
+
+Use single when one school or college hosts its own copy. Use multi when you run one service for several schools
+and bill them.
+
 ## Multi-school service
 
 ```bash

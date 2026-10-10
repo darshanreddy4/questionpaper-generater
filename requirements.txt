@@ -1,0 +1,27 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+pydantic>=2.6
+PyJWT>=2.8
+httpx>=0.27
+reportlab>=4.2
+uharfbuzz>=0.39
+python-docx>=1.1
+matplotlib>=3.8
+numpy>=1.26
+pymupdf>=1.24
+pillow>=10.0
+pypdf>=4.0
+pdfminer.six
+ebooklib
+beautifulsoup4
+striprtf
+pytest>=8.0
+sympy>=1.12
+cryptography>=42
+
+# Optional, used by the bundled book_to_skill reader when present (not needed; ExamForge falls back without them):
+#   trafilatura          cleaner main-content extraction from .html uploads
+#   pdf-inspector>=1.15  faster PDF text extraction

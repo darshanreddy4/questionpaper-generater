@@ -1,0 +1,14 @@
+Third-party code bundled with ExamForge
+=======================================
+
+book_to_skill/   (file reading, text cleaning, chapter detection)
+    MIT License, Copyright (c) 2025 virgiliojr94. Copied unmodified from the book-to-skill project.
+    Full licence text: book_to_skill/LICENSE.md
+
+app/fonts/       (Noto Sans fonts for Devanagari, Bengali, Gurmukhi, Gujarati, Odia, Tamil, Telugu, Kannada, Malayalam)
+    SIL Open Font License 1.1, Copyright 2022 The Noto Project Authors. Full text: app/fonts/OFL.txt
+
+app/static/vendor/katex/   (maths typesetting in the browser)
+    MIT License, Copyright (c) Khan Academy and other contributors.
+
+Python packages installed from requirements.txt keep their own licences.

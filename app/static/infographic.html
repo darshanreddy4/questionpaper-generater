@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExamForge — how it works (infographic)</title>
+<style>
+  :root{--ink:#14213d;--muted:#5b6785;--line:#dfe5f3;--blue:#2f5bea;--blue2:#5b8cff;--green:#12905a;--amber:#d98200;--red:#d6455d;--violet:#7a4ee0;--bg:#f4f7ff}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#e9eefb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.45}
+  .poster{width:1200px;margin:0 auto;background:var(--bg);box-shadow:0 10px 50px rgba(20,33,61,.18)}
+  .hero{background:linear-gradient(135deg,#1b2f78 0%,#2f5bea 55%,#6c8cff 100%);color:#fff;padding:54px 60px 70px;position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-90px;top:-90px;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.08)}
+  .hero h1{font-size:50px;letter-spacing:-.02em;line-height:1.05}
+  .hero p{font-size:20px;max-width:720px;margin-top:14px;opacity:.95}
+  .pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+  .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:7px 14px;border-radius:99px;font-size:14px;font-weight:600}
+  section{padding:44px 60px 8px}
+  h2{font-size:27px;letter-spacing:-.01em;display:flex;align-items:center;gap:12px}
+  h2 .n{background:var(--blue);color:#fff;border-radius:10px;width:36px;height:36px;display:inline-grid;place-items:center;font-size:18px}
+  .sub{color:var(--muted);margin:6px 0 20px;font-size:15.5px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .row{display:flex;gap:16px}
+  .journey{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;position:relative}
+  .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 14px 14px;position:relative;text-align:center}
+  .step:not(:last-child):after{content:"➜";position:absolute;right:-17px;top:42%;color:var(--blue);font-size:20px;z-index:2}
+  .step .ic{font-size:30px}
+  .step b{display:block;margin-top:6px;font-size:15px}
+  .step span{display:block;color:var(--muted);font-size:12.5px;margin-top:5px}
+  .step .no{position:absolute;top:-11px;left:-8px;background:var(--blue);color:#fff;width:26px;height:26px;border-radius:50%;font-size:13px;font-weight:700;display:grid;place-items:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .tag{display:inline-block;background:#eaf0ff;color:var(--blue);border-radius:7px;padding:2px 9px;font-size:12px;font-weight:700;margin:3px 3px 0 0}
+  .tag.g{background:#e3f6ed;color:var(--green)} .tag.a{background:#fff1da;color:var(--amber)} .tag.v{background:#eee6fd;color:var(--violet)} .tag.r{background:#fde6ea;color:var(--red)}
+  h3{font-size:16.5px;margin-bottom:6px}
+  .card p,.card li{font-size:14px;color:#33405f}
+  ul{padding-left:18px} li{margin:3px 0}
+  .wiz{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px}
+  .wiz .card{border-top:4px solid var(--blue)}
+  .wiz .card:nth-child(2){border-top-color:var(--violet)} .wiz .card:nth-child(3){border-top-color:var(--amber)} .wiz .card:nth-child(4){border-top-color:var(--green)}
+  .wiz small{color:var(--blue);font-weight:700;font-size:12px;letter-spacing:.06em}
+  /* pipeline */
+  .pipe{display:flex;align-items:stretch;gap:8px}
+  .node{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center;font-size:13px}
+  .node b{display:block;font-size:14px;margin-bottom:3px}
+  .node.code{border-color:#9ad9bb;background:#f2fbf6} .node.ai{border-color:#c9b6f5;background:#f8f4ff} .node.chk{border-color:#f3cf8f;background:#fff9ee}
+  .arrow{align-self:center;color:var(--blue);font-weight:700;font-size:18px}
+  .legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin:12px 0 0}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  /* writers */
+  .writer{text-align:center}
+  .writer .big{font-size:34px}
+  .writer .cost{display:inline-block;margin-top:8px;border-radius:99px;padding:4px 12px;font-weight:700;font-size:13px}
+  .cost.z{background:#e3f6ed;color:var(--green)} .cost.t{background:#eee6fd;color:var(--violet)}
+  .meter{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+  .bar{height:26px;border-radius:8px;display:flex;overflow:hidden;font-size:12px;font-weight:700;color:#fff;margin:8px 0}
+  .bar i{display:grid;place-items:center;font-style:normal}
+  .saver{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13.2px}
+  .saver b{display:block;font-size:13.8px} .saver .e{font-size:20px;line-height:1}
+  /* failure */
+  .fail{display:grid;grid-template-columns:1.1fr 1.4fr 1.4fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;font-size:13.2px}
+  .fail div{padding:9px 12px;border-bottom:1px solid var(--line)}
+  .fail .h{background:#1b2f78;color:#fff;font-weight:700;border:0}
+  .fail div:nth-last-child(-n+3){border-bottom:0}
+  .feat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .feat .ic{font-size:22px} .feat b{display:block;margin:4px 0 2px;font-size:14.5px} .feat p{font-size:12.8px;color:var(--muted)}
+  .docs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .paper{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 16px;box-shadow:0 5px 14px rgba(20,33,61,.08);font-size:11.5px;min-height:170px}
+  .paper h4{text-align:center;font-size:12.5px;border-bottom:1.5px solid var(--ink);padding-bottom:5px;margin-bottom:6px}
+  .paper .l{height:6px;background:#e5e9f4;border-radius:3px;margin:6px 0} .paper .l.s{width:62%}
+  .paper .ok{color:var(--green);font-weight:700}
+  .cta{margin:44px 60px 0;background:linear-gradient(135deg,#12905a,#27b97a);color:#fff;border-radius:18px;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  .cta b{font-size:21px} .cta code{background:rgba(255,255,255,.2);padding:3px 9px;border-radius:7px;font-size:14px}
+  footer{padding:26px 60px 36px;color:var(--muted);font-size:12.5px;text-align:center}
+  @media print{body{background:#fff}.poster{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="poster">
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <h1>ExamForge</h1>
+  <p>Turn textbooks, notes and syllabi into exam-ready question papers and answer keys — in the board pattern you need, with diagrams and equations, in PDF or Word.</p>
+  <div class="pills">
+    <span class="pill">📚 Reads any document</span><span class="pill">🧭 10 board &amp; university patterns</span>
+    <span class="pill">📐 Maths diagrams &amp; equations</span><span class="pill">✅ Answers checked by code</span>
+    <span class="pill">🪙 Built to save AI tokens</span><span class="pill">📄 PDF · DOCX · ZIP</span>
+  </div>
+</div>
+
+<!-- ================= 1. USER JOURNEY ================= -->
+<section>
+  <h2><span class="n">1</span>A teacher’s journey: from files to a finished paper</h2>
+  <p class="sub">Everything happens in the browser. No installation, no templates to edit by hand.</p>
+  <div class="journey">
+    <div class="step"><span class="no">1</span><div class="ic">🔐</div><b>Sign in</b><span>Register once; the first account becomes the administrator</span></div>
+    <div class="step"><span class="no">2</span><div class="ic">📥</div><b>Add documents</b><span>Source library → drag in textbooks, notes, syllabi, past papers</span></div>
+    <div class="step"><span class="no">3</span><div class="ic">🧭</div><b>Plan the paper</b><span>New paper → 4 guided steps (below)</span></div>
+    <div class="step"><span class="no">4</span><div class="ic">⚙️</div><b>Generate</b><span>Live progress bar; you can leave and come back</span></div>
+    <div class="step"><span class="no">5</span><div class="ic">✏️</div><b>Review &amp; edit</b><span>Edit, regenerate or remove any question; see answers</span></div>
+    <div class="step"><span class="no">6</span><div class="ic">⬇️</div><b>Download</b><span>PDF or Word; paper, key, or teacher’s copy; sets A–D</span></div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h3>📥 Adding documents (Source library)</h3>
+      <p>Drop up to 10 files at a time (50 MB each). ExamForge extracts the text, finds chapters, and — when an AI key is set — reads <b>diagrams</b> and <b>scanned pages</b> too.</p>
+      <div style="margin-top:8px">
+        <span class="tag">PDF</span><span class="tag">Word (DOCX, DOC)</span><span class="tag">PowerPoint</span><span class="tag">EPUB</span><span class="tag">RTF</span><span class="tag">ODT</span><span class="tag">HTML</span><span class="tag">Text / Markdown</span><span class="tag">CSV</span><span class="tag a">Images (PNG, JPG)</span><span class="tag a">Scanned PDFs</span>
+      </div>
+      <ul style="margin-top:10px">
+        <li>Status shows <b>queued → processing → ready</b>; failures explain why.</li>
+        <li>Hidden “prompt-injection” characters are stripped from every file.</li>
+        <li>A past paper can be uploaded to <b>learn its pattern</b>.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🧭 The four-step paper wizard</h3>
+      <div class="wiz" style="grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+        <div class="card" style="padding:12px"><small>STEP 1</small><h3 style="font-size:14.5px">Subject &amp; sources</h3><p>Title, school, class, board, language; tick the documents to use.</p></div>
+        <div class="card" style="padding:12px;border-top-color:var(--violet)"><small style="color:var(--violet)">STEP 2</small><h3 style="font-size:14.5px">Exam pattern</h3><p>Pick a preset, edit sections, or read it from a sample paper.</p></div>
+        <div class="card" style="padding:12px;border-top-color:var(--amber)"><small style="color:var(--amber)">STEP 3</small><h3 style="font-size:14.5px">Syllabus &amp; difficulty</h3><p>Topic weights, easy/medium/hard sliders, diagrams, parallel sets, reuse bank.</p></div>
+        <div class="card" style="padding:12px;border-top-color:var(--green)"><small style="color:var(--green)">STEP 4</small><h3 style="font-size:14.5px">Review &amp; generate</h3><p>See every planned question slot first, then press Generate.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. INSIDE ================= -->
+<section>
+  <h2><span class="n">2</span>What happens inside the agent</h2>
+  <p class="sub">Code does everything it can do exactly. The AI is called only where language skill is truly needed.</p>
+  <div class="pipe">
+    <div class="node code"><b>📄 Read</b>Extract text, strip hidden characters, detect chapters</div><span class="arrow">➜</span>
+    <div class="node code"><b>🔎 Index</b>Chunk by heading, build a search index (BM25)</div><span class="arrow">➜</span>
+    <div class="node code"><b>🗺️ Blueprint</b>One slot per question: type, marks, difficulty, topic, diagram?</div><span class="arrow">➜</span>
+    <div class="node"><b>🧑‍🏫 Choose writer</b>Bank → Code → AI (next block)</div><span class="arrow">➜</span>
+    <div class="node chk"><b>🧮 Check</b>Validate, de-duplicate, re-compute answers</div><span class="arrow">➜</span>
+    <div class="node code"><b>📑 Export</b>Draw diagrams &amp; maths, build PDF / DOCX</div>
+  </div>
+  <div class="legend"><span><i class="dot" style="background:#9ad9bb"></i>Plain code — zero AI tokens</span><span><i class="dot" style="background:#f3cf8f"></i>Code that checks the AI’s work</span><span><i class="dot" style="background:#c9b6f5"></i>AI model</span></div>
+
+  <h3 style="margin:26px 0 10px;font-size:19px">Every question slot picks the cheapest writer that can do it well</h3>
+  <div class="grid3">
+    <div class="card writer" style="border-top:4px solid #12905a">
+      <div class="big">🗃️</div><h3>1 · Your question bank</h3>
+      <p>If you ticked “reuse”, an approved question with the same type, marks, difficulty and topic fills the slot.</p>
+      <span class="cost z">0 tokens</span>
+    </div>
+    <div class="card writer" style="border-top:4px solid #2f5bea">
+      <div class="big">🧩</div><h3>2 · Code</h3>
+      <p><b>Maths:</b> 22 exact templates (equations, triangles, circles, statistics, calculus, matrices…) with matching diagrams. <b>Other subjects:</b> definitions, fill-ins, true/false, matching built from your own text.</p>
+      <span class="cost z">0 tokens · exact answers</span>
+    </div>
+    <div class="card writer" style="border-top:4px solid #7a4ee0">
+      <div class="big">🤖</div><h3>3 · AI model</h3>
+      <p>Hard questions, long answers, case studies, application and analysis, assertion-reason, anything outside the templates.</p>
+      <span class="cost t">Tokens — but trimmed &amp; cached</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. TOKENS ================= -->
+<section>
+  <h2><span class="n">3</span>How it keeps AI usage low without losing quality</h2>
+  <p class="sub">A typical paper mixes all three writers, so only part of it ever reaches the model.</p>
+  <div class="meter">
+    <b style="font-size:14px">Illustration: who writes a paper (example mix — depends on subject, topics and difficulty)</b>
+    <div class="bar"><i style="width:20%;background:#12905a">Bank</i><i style="width:45%;background:#2f5bea">Code</i><i style="width:35%;background:#7a4ee0">AI</i></div>
+    <div style="font-size:12.5px;color:var(--muted)">The paper’s quality panel shows the real split and token count for each paper you make.</div>
+  </div>
+  <div class="grid4" style="margin-top:16px">
+    <div class="saver"><span class="e">📦</span><div><b>Batching</b>One call writes 3–8 questions; rules are paid once per batch.</div></div>
+    <div class="saver"><span class="e">✂️</span><div><b>Only relevant sentences</b>Each source passage is cut to what the topic needs (≤ 1,200 chars).</div></div>
+    <div class="saver"><span class="e">🎯</span><div><b>Retry only what failed</b>Good questions are never rewritten.</div></div>
+    <div class="saver"><span class="e">🧠</span><div><b>Reply cache</b>Same upload, same seed or same pattern is free the second time.</div></div>
+    <div class="saver"><span class="e">⚡</span><div><b>Prompt caching</b>Stable rules prompt gets the provider’s discounted cache rate.</div></div>
+    <div class="saver"><span class="e">🐇</span><div><b>Cheaper “fast” model</b>Optional, for reading figures and sample papers.</div></div>
+    <div class="saver"><span class="e">🖼️</span><div><b>Image cap</b>At most 20 images analysed per document.</div></div>
+    <div class="saver"><span class="e">🚦</span><div><b>Daily token budget</b>Per-user limit on the platform key; usage and billing views for admins.</div></div>
+  </div>
+</section>
+
+<!-- ================= 4. SAFETY ================= -->
+<section>
+  <h2><span class="n">4</span>If something goes wrong</h2>
+  <p class="sub">Failures are expected; the system retries, repairs, flags, or tells you plainly — it never silently hands you a bad paper.</p>
+  <div class="fail">
+    <div class="h">What fails</div><div class="h">What ExamForge does</div><div class="h">What you see</div>
+    <div>AI reply is malformed JSON</div><div>Repairs fences, LaTeX slashes, commas; else one low-temperature retry</div><div>Nothing — it just works</div>
+    <div>A question breaks a rule (options, marks, diagram)</div><div>Sends the exact error back; retries only that question (up to 3×)</div><div>Nothing, or a flagged placeholder</div>
+    <div>Wrong arithmetic in an answer key</div><div>Code re-computes steps and solves equations; retries with the contradiction</div><div>“Answer checked” or “Check the answer” badge</div>
+    <div>Duplicate or repeat of an old paper</div><div>Rejected and rewritten</div><div>Nothing</div>
+    <div>AI service slow / rate-limited</div><div>Backs off, honours retry-after, adapts unsupported parameters</div><div>Slightly slower</div>
+    <div>Server restarts mid-job</div><div>Jobs live in the database; heartbeat expires; re-queued (max 3 tries)</div><div>“Resuming after an interruption”</div>
+    <div>Scanned PDF but no vision AI</div><div>Stops early with a clear instruction</div><div>Failed badge + reason</div>
+  </div>
+</section>
+
+<!-- ================= 5. FEATURES ================= -->
+<section>
+  <h2><span class="n">5</span>Everything the website can do</h2>
+  <p class="sub">Menu: Papers · New paper · Source library · Question bank · Administration (admins)</p>
+  <div class="grid4">
+    <div class="feat"><div class="ic">🧭</div><b>10 ready patterns</b><p>CBSE 10 &amp; 12, ICSE, State Board, University semester &amp; internal, JEE, NEET, IGCSE, Unit test.</p></div>
+    <div class="feat"><div class="ic">🛠️</div><b>Custom patterns</b><p>Edit sections, marks, “attempt any N”, OR choices, negative marking. Save as yours.</p></div>
+    <div class="feat"><div class="ic">📄</div><b>Learn from a sample paper</b><p>Upload last year’s paper and ExamForge reads its structure for you to review.</p></div>
+    <div class="feat"><div class="ic">🎚️</div><b>Difficulty mix</b><p>Easy / medium / hard sliders, matched by marks; Bloom levels spread automatically.</p></div>
+    <div class="feat"><div class="ic">🗂️</div><b>Syllabus weights</b><p>Paste an outline or load chapters from your books; weights decide marks per topic.</p></div>
+    <div class="feat"><div class="ic">❓</div><b>10 question types</b><p>MCQ, assertion-reason, fill-blank, true/false, match, very short, short, long, numerical, case study.</p></div>
+    <div class="feat"><div class="ic">📐</div><b>Maths diagrams</b><p>Geometry, graphs, bar / histogram / pie, Venn, number lines — drawn to scale from the numbers.</p></div>
+    <div class="feat"><div class="ic">🖼️</div><b>Reads your diagrams</b><p>Optional AI step, ticked per upload: figures in your books are described and, where possible, redrawn.</p></div>
+    <div class="feat"><div class="ic">∑</div><b>Equations</b><p>Fractions, roots, integrals, Greek, matrices, determinants, piecewise cases, aligned steps.</p></div>
+    <div class="feat"><div class="ic">🔀</div><b>Parallel sets A–D</b><p>Same questions, shuffled order and options, with matching answer keys.</p></div>
+    <div class="feat"><div class="ic">✏️</div><b>Inline editor</b><p>Edit text, marks, options, marking steps, diagram JSON; regenerate one question with an instruction.</p></div>
+    <div class="feat"><div class="ic">📊</div><b>Quality report</b><p>Score, difficulty vs target, topic coverage, duplicates, missing diagrams, who wrote what.</p></div>
+    <div class="feat"><div class="ic">🗃️</div><b>Question bank</b><p>Every accepted question is kept, searchable by topic, difficulty and type; avoid or reuse.</p></div>
+    <div class="feat"><div class="ic">⬇️</div><b>PDF · Word · ZIP</b><p>Choose document, set and format — or download everything at once.</p></div>
+    <div class="feat"><div class="ic">👥</div><b>Teams &amp; admin</b><p>Roles, enable/disable users, full audit log of who did what.</p></div>
+    <div class="feat"><div class="ic">🎛️</div><b>Writing mode &amp; cost preview</b><p>Automatic, Code only (no AI) or AI for all — and see who writes what before generating.</p></div>
+    <div class="feat"><div class="ic">🔑</div><b>Bring your own AI key</b><p>Teachers or the school add an OpenAI, Anthropic or compatible key; stored encrypted, never shown again.</p></div>
+    <div class="feat"><div class="ic">💳</div><b>Usage &amp; charges</b><p>Monthly view: platform tokens charged, own-key tokens free of our charge, plus the platform fee.</p></div>
+    <div class="feat"><div class="ic">🏫</div><b>School-wide key</b><p>An admin sets one key for every teacher; teachers can still use their own.</p></div>
+    <div class="feat"><div class="ic">🔒</div><b>Built-in security</b><p>Hashed passwords, expiring sessions, per-user data, upload checks, rate limits, no code execution.</p></div>
+  </div>
+</section>
+
+<!-- ================= 6. OUTPUTS ================= -->
+<section>
+  <h2><span class="n">6</span>What you download</h2>
+  <p class="sub">Each document in PDF or Word, for any set (A–D).</p>
+  <div class="docs">
+    <div class="paper"><h4>QUESTION PAPER</h4><div style="display:flex;justify-content:space-between;font-weight:700"><span>Time: 3 hours</span><span>Max Marks: 80</span></div><div class="l"></div><div class="l s"></div>
+      <b style="font-size:11px">SECTION A — MCQ  (20 × 1)</b><div class="l"></div><div class="l"></div><div class="l s"></div><div style="text-align:center;font-size:20px">△</div></div>
+    <div class="paper"><h4 style="color:#12905a">ANSWER KEY &amp; MARKING SCHEME</h4><b style="font-size:11px">Objective key</b><div style="margin:4px 0">1(b) 2(d) 3(a) 4(c) …</div>
+      <div class="l"></div><div class="l s"></div><b style="font-size:11px">Q21</b> step-wise marks <span class="ok">✓ 1 + 1 + 2</span><div class="l"></div></div>
+    <div class="paper"><h4 style="color:#7a4ee0">TEACHER’S COPY</h4><div class="l"></div><div class="l s"></div><b style="font-size:11px">Q5. Find the roots of x² − 5x + 6 = 0</b>
+      <div style="color:#12905a;margin-top:4px"><b>ANSWER</b> x = 2 or x = 3</div><div class="l"></div><div class="l s"></div></div>
+  </div>
+</section>
+
+<div class="cta">
+  <div><b>Start in three clicks</b><br>Source library → New paper → Generate</div>
+  <div style="text-align:right">Open <code>http://127.0.0.1:8000</code><br><span style="font-size:13px;opacity:.9">Add an OpenAI or Anthropic key for AI-written questions &amp; diagram reading; without one, code-written questions still work.</span></div>
+</div>
+<footer>ExamForge · ask the AI only what needs an AI · check everything else with code</footer>
+</div>
+</body>
+</html>

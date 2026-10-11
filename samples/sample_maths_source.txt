@@ -1,0 +1,192 @@
+Chapter 1: Linear Equations
+
+A linear equation in one variable is an equation of the form ax + b = c, where a, b and c are constants and a is
+not zero. Solving a linear equation means finding the value of x that makes the equation true.
+
+Example: Solve 3x + 7 = 22.
+Subtract 7 from both sides: 3x = 15.
+Divide both sides by 3: x = 5.
+
+Linear equations are used to model simple real-life situations such as sharing costs, calculating ages and finding
+unknown quantities in everyday problems.
+
+
+Chapter 2: Quadratic Equations
+
+A quadratic equation is a polynomial equation of degree two, written in the standard form ax^2 + bx + c = 0, where
+a is not zero. The roots of a quadratic equation can be found by factorisation, by completing the square, or by the
+quadratic formula x = (-b +/- sqrt(b^2 - 4ac)) / 2a.
+
+The discriminant of a quadratic equation is defined as D = b^2 - 4ac. If D is greater than zero the roots are real
+and distinct, if D equals zero the roots are real and equal, and if D is less than zero the roots are not real.
+
+Example: Find the roots of x^2 - 7x + 12 = 0.
+Factorise: (x - 3)(x - 4) = 0.
+So x = 3 or x = 4.
+
+
+Chapter 3: Arithmetic Progressions
+
+An arithmetic progression is a sequence of numbers in which the difference between any two consecutive terms is
+constant. This constant is called the common difference, usually written d. If the first term is a, the nth term of
+an arithmetic progression is given by a_n = a + (n - 1)d.
+
+Example: Find the 10th term of the arithmetic progression 3, 7, 11, 15, ...
+Here a = 3 and d = 4.
+a_10 = 3 + (10 - 1) x 4 = 3 + 36 = 39.
+
+
+Chapter 4: Triangles
+
+Figure 1: A right-angled triangle ABC, with the right angle at B, side AB vertical, side BC horizontal, and the
+hypotenuse AC joining A to C.
+
+The Pythagoras theorem states that in a right-angled triangle, the square of the hypotenuse is equal to the sum of
+the squares of the other two sides. If AB and BC are the two legs of a right-angled triangle and AC is the
+hypotenuse, then AC^2 = AB^2 + BC^2.
+
+Example: In a right-angled triangle, AB = 6 cm and BC = 8 cm. Find AC.
+AC^2 = 6^2 + 8^2 = 36 + 64 = 100.
+AC = 10 cm.
+
+Two triangles are called similar triangles when their corresponding angles are equal and their corresponding sides
+are in the same ratio. This is also known as the basic proportionality theorem (Thales theorem): if a line is drawn
+parallel to one side of a triangle intersecting the other two sides, it divides those two sides in the same ratio.
+
+Figure 2: Triangle ABC with a line DE drawn parallel to BC, where D lies on AB and E lies on AC, showing the
+proportional segments AD, DB, AE and EC.
+
+
+Chapter 5: Coordinate Geometry
+
+The distance between two points A(x1, y1) and B(x2, y2) in the coordinate plane is given by the distance formula:
+AB = sqrt((x2 - x1)^2 + (y2 - y1)^2).
+
+Example: Find the distance between the points A(2, 3) and B(5, 7).
+AB = sqrt((5 - 2)^2 + (7 - 3)^2) = sqrt(9 + 16) = sqrt(25) = 5 units.
+
+A straight line can be written in the form y = mx + c, where m is the slope and c is the y-intercept. The graph of a
+straight line crosses the x-axis and the y-axis at points that can be found by substitution.
+
+Figure 3: A straight line graph on the coordinate plane, sloping upward from left to right, crossing the y-axis
+above the origin and the x-axis to the right of the origin.
+
+
+Chapter 6: Trigonometry
+
+Trigonometry is the branch of mathematics that studies the relationships between the angles and sides of triangles.
+For a right-angled triangle, tan(angle) is defined as the ratio of the side opposite the angle to the side adjacent
+to the angle.
+
+The angle of elevation is the angle formed by the line of sight with the horizontal when an observer looks upward
+at an object. The angle of depression is the angle formed when the observer looks downward.
+
+Figure 4: A vertical tower BT standing on the ground, with a point C on the ground some distance from its foot, and
+the angle of elevation marked at C between the ground and the line of sight to the top of the tower T.
+
+Example: A tower stands vertically. From a point 20 m from its foot, the angle of elevation of the top is 45
+degrees. Find the height of the tower.
+tan 45 = height / 20, and since tan 45 = 1, the height of the tower is 20 m.
+
+
+Chapter 7: Circles and Mensuration
+
+The area of a circle of radius r is given by the formula area = pi r^2, and the circumference of a circle is given
+by 2 pi r. Using pi = 22/7 makes the arithmetic exact for radii that are multiples of 7.
+
+Example: Find the area of a circle of radius 14 cm.
+Area = 22/7 x 14 x 14 = 616 square cm.
+
+The area of a triangle is given by area = 1/2 x base x height.
+
+A cylinder is a solid with two parallel circular bases joined by a curved surface. The volume of a cylinder of base
+radius r and height h is given by volume = pi r^2 h, and its curved surface area is given by 2 pi r h.
+
+Figure 5: A right circular cylinder with its base radius and height both labelled.
+
+Example: Find the volume of a cylinder with base radius 7 cm and height 10 cm.
+Volume = 22/7 x 7 x 7 x 10 = 1540 cubic cm.
+
+
+Chapter 8: Statistics
+
+The mean of a set of observations is the sum of all the observations divided by the number of observations. The
+median of a set of observations is the middle value when the observations are arranged in ascending order; for an
+even number of observations it is the average of the two middle values.
+
+Example: Find the mean of the observations 4, 8, 6, 5, 7.
+Mean = (4 + 8 + 6 + 5 + 7) / 5 = 30 / 5 = 6.
+
+Example: Find the median of the observations 11, 7, 15, 3, 9.
+In ascending order: 3, 7, 9, 11, 15. The median is the middle value, 9.
+
+
+Chapter 9: Probability
+
+Probability is a measure of how likely an event is to occur, defined as the number of favourable outcomes divided
+by the total number of equally likely outcomes.
+
+Example: A bag contains 5 red balls and 3 blue balls. One ball is drawn at random. Find the probability that it is
+red.
+Total outcomes = 5 + 3 = 8.
+P(red) = 5 / 8.
+
+
+Chapter 10: Sets
+
+A set is a well-defined collection of distinct objects. The union of two sets A and B, written A union B, is the
+set of all elements that are in A, in B, or in both. The intersection of two sets A and B, written A intersection B,
+is the set of elements that are in both A and B.
+
+Figure 6: A Venn diagram showing two overlapping circles labelled A and B, with the number of elements marked in
+each region: only in A, only in B, in both A and B, and outside both sets.
+
+Example: If a set A has 5 elements not in B, set B has 4 elements not in A, and 3 elements are common to both sets,
+find the number of elements in A union B.
+n(A union B) = 5 + 3 + 4 = 12.
+
+
+Chapter 11: Commercial Mathematics
+
+Profit and loss are calculated on the cost price of an article. If an article is bought for a cost price and sold
+for a selling price higher than the cost price, the difference is called profit; if the selling price is lower, the
+difference is called loss. Profit or loss is usually expressed as a percentage of the cost price.
+
+Simple interest on a sum of money is calculated using the formula simple interest = (principal x rate x time) / 100,
+where the rate is the annual rate of interest and the time is measured in years.
+
+Example: Find the simple interest on Rs 5000 for 3 years at 8 per cent per annum.
+Simple interest = (5000 x 8 x 3) / 100 = 1200.
+
+
+Chapter 12: Pair of Linear Equations in Two Variables
+
+A pair of simultaneous linear equations in two variables can be solved by substitution, elimination, or using
+determinants (Cramer's rule). Two linear equations in x and y have a unique solution when their coefficients are
+not proportional.
+
+Example: Solve the pair of linear equations 2x + 3y = 13 and x - y = 1.
+From the second equation, x = y + 1.
+Substitute into the first equation: 2(y + 1) + 3y = 13, giving 5y + 2 = 13, so y = 2.2... (illustrative only).
+
+
+Chapter 13: Matrices and Determinants
+
+A matrix is a rectangular array of numbers arranged in rows and columns. The determinant of a 2 by 2 matrix with
+entries a, b in the first row and c, d in the second row is calculated as ad - bc.
+
+Example: Find the determinant of the matrix with rows (4, 3) and (2, 5).
+Determinant = 4 x 5 - 3 x 2 = 20 - 6 = 14.
+
+
+Chapter 14: Calculus - Derivatives and Integrals
+
+The derivative of a function describes its rate of change. Using the power rule, the derivative of x raised to the
+power n is n times x raised to the power (n - 1). The integral of a function is the reverse process of
+differentiation, and the integral of x raised to the power n is x raised to the power (n + 1), divided by (n + 1).
+
+Example: Find the derivative of y = x^3 + 2x.
+dy/dx = 3x^2 + 2.
+
+Example: Evaluate the integral of 3x^2 with respect to x.
+Integral = x^3 + C.

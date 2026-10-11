@@ -150,6 +150,111 @@ published, and the operator can publish only items in the operator's own library
 - **What keeps working:** "Register a school" and "Join with code" still work, because school registration has its
   own setting (`EXAMFORGE_ALLOW_SCHOOL_SIGNUP`, also on by default).
 
+## Formatting source documents for the built-in writer (no AI)
+
+Without any AI key, ExamForge still writes a full paper, but only from what it can read with confidence out of your
+PDF/DOCX/etc. There is no AI involved in any of this — just pattern matching — so the exact wording of your document
+decides what it can do. This section is a guide to writing or formatting source material so the built-in writer gets
+the most out of it.
+
+### 1. Chapter / topic detection ("Load chapters from sources")
+
+A heading is only trusted if it is one of:
+
+- **Markdown**: `# Chapter title` (works even mid-document, one to four `#`).
+- **An explicit marker**: a line starting with `Chapter`, `Unit`, `Lesson`, `Module` or `Topic` followed by a number,
+  e.g. `Chapter 3: Quadratic Equations` (also recognised in Hindi, Bengali, Tamil, Telugu, Kannada, Malayalam, Marathi,
+  Gujarati, Punjabi, Odia, Assamese and Sanskrit — `अध्याय 3`, `পাঠ ২`, etc.).
+- **A short numbered line on its own paragraph**, e.g. `9. Quadratic Equations` (number, then a short title, blank
+  line before and after it) — but *not* if it reads like an instruction or question ("Find...", "Explain...",
+  "What is...", anything ending in "?") or is mostly digits ("2 4 6 8 10") — those are recognised as exercise
+  text, not headings, and skipped.
+- **A short ALL-CAPS line that repeats** word-for-word elsewhere in the document, e.g. a running header printed on
+  every page. A one-off ALL-CAPS fragment (common on a title page) is ignored, since it is usually a stray fragment,
+  not a real heading.
+- A heading containing "solutions" or "answer key" is still detected correctly, but is left out of the topic list
+  on purpose — it is real, just not something you want to weight exam marks toward.
+
+If none of this matches anywhere in your document, "Load chapters from sources" simply finds nothing — it will not
+invent a topic. Type the topic yourself in the syllabus box instead; that path never depends on document formatting
+at all. You can also ask the operator/admin to run **Label chapters with AI** once per document (Source library) if
+an AI key is available — that one-time AI pass is saved permanently, so the document never needs AI again after that.
+
+### 2. Code-written mathematics questions (exact, zero AI tokens)
+
+The built-in maths writer only fires when **all** of these are true for a slot: the subject reads as mathematics,
+the question is not `hard` difficulty, the Bloom level is not `analyze`/`evaluate`/`create`, the question type is one
+of `mcq`/`fill_blank`/`true_false`/`very_short`/`short`/`numerical` within its mark cap (1-3 depending on type), and
+the **topic name contains one of these words/phrases** (case-insensitive, matched as a substring):
+
+| Template | Topic must mention |
+|---|---|
+| Linear equations | `linear equation`, `simple equation`, `algebra` |
+| Quadratic equations | `quadratic`, `roots` |
+| Pythagoras theorem | `pythagoras`, `triangle`, `right-angled` / `right angled` |
+| Area of a triangle | `area of`, `mensuration`, `heron` |
+| Area of a circle | `circle`, `area of`, `mensuration`, `sector` |
+| Straight lines / graphs | `coordinate`, `graph`, `straight line`, `intercept` |
+| Mean | `mean`, `statistic`, `average`, `data` |
+| Arithmetic progression | `progression`, `sequence`, `series`, `ap` |
+| Probability | `probability`, `chance` |
+| Trigonometry (heights/distances) | `trigonometr`, `height`, `elevation`, `depression` |
+| Sets (Venn diagrams) | `sets`, `venn`, `union`, `intersection` |
+| Profit, loss, discount | `percent`, `profit`, `loss`, `discount`, `commercial` |
+| Simple interest | `interest`, `simple interest`, `commercial` |
+| Pair of linear equations | `pair of linear`, `simultaneous`, `two variables` |
+| Distance between points | `coordinate`, `distance`, `section formula`, `cartesian` |
+| Cylinder (volume) | `cylinder`, `volume`, `surface area`, `mensuration` |
+| Similar triangles | `similar`, `triangle`, `thales`, `proportionality` |
+| Median | `median`, `statistic`, `central tendency`, `data` |
+| Derivatives | `derivative`, `differentiation`, `calculus`, `rate of change` |
+| Integrals | `integral`, `integration`, `calculus`, `antiderivative` |
+| Determinants | `matrix`, `matrices`, `determinant` |
+| Discriminant / nature of roots | `discriminant`, `nature of roots` |
+
+In practice: naming your syllabus topics with these exact words ("Quadratic equations", "Pythagoras theorem",
+"Simple interest", ...) gets you fully worked, numerically-checked questions with real steps and no AI tokens.
+A topic the library does not cover (e.g. "Patterns in mathematics", "Algebraic identities") always goes to AI,
+or is left blank if no AI key is configured — there is no partial credit for a near-miss topic name.
+
+### 3. Code-written factual questions for other subjects (zero AI tokens)
+
+For non-maths subjects, the built-in writer looks for **definition sentences** in your uploaded material — one
+sentence, 35-260 characters, starting with a capital letter, with this shape:
+
+> `<Term> is/are/refers to/is defined as/means/is called/is known as <description>.`
+
+For example: *"Photosynthesis is the process by which green plants prepare their own food using sunlight."* Textbook
+prose and glossaries written this way (rather than bullet points or fragments) let the writer build fill-in-the-blank,
+MCQ, true/false, match-the-following and "define X" questions straight from your own sentences, no AI involved.
+At least 3 qualifying sentences are needed per topic for short answers, and at least 4 definition-style sentences for
+a match-the-following question. Sentences with a URL, `©`, or a "Figure/Table/Page N" reference are ignored, since
+they usually depend on something not in the text.
+
+### 4. Reproducing an existing question paper exactly ("Use the exact questions from my source document")
+
+This mode copies questions verbatim — no rewriting, no AI — so it needs the source to already look like a paper:
+
+- Each question starts its own numbered line: `1.`, `2.`, ... or `Q1.`, `Question 1:`.
+- Multiple-choice options follow immediately, one per line: `(a) ...`, `(b) ...`, `(c) ...`, `(d) ...`.
+- If the source also prints the answer (`Ans: (b)`, `Answer: b`, `Sol: ...` right after the options or question),
+  the MCQ is reproduced as a proper MCQ with the correct option marked. **Without a printed answer, the options are
+  kept as plain text within the question** rather than guessing which one is right — nothing is ever invented.
+- An optional mark hint at the end of the line, `[2]` or `(2 marks)`, sets how many marks code-detects for that item
+  (the exam pattern you picked still decides the paper's actual marks scheme).
+
+### In short
+
+| You want | Write your document like |
+|---|---|
+| Clean topic list | Markdown `#` headings, or `Chapter N: Title` lines |
+| Free, exact maths questions | Syllabus topic names matching the table above |
+| Free, exact questions for other subjects | Clear "X is Y." definition sentences |
+| An exact copy of an existing paper | Numbered questions, `(a)-(d)` options, printed answers |
+
+None of this is required — without any of it, ExamForge still works, it just needs an AI key to write the paper
+instead of writing it for free.
+
 ## Multi-school service
 
 ```bash

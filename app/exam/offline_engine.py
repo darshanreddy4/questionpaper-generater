@@ -517,7 +517,9 @@ def match_templates(topic: str, wants_diagram: bool) -> List[str]:
     """Templates whose subject matter really is *topic* (empty when the topic is outside the library)."""
     pool = _DIAGRAM_TEMPLATES if wants_diagram else list(_MATH_TEMPLATES)
     t = topic.lower()
-    return [n for n in pool if any(k in t for k in _template_keys(n))]
+    # a leading word boundary stops short keys like "ap" matching mid-word ("ch-AP-ter"); no trailing boundary,
+    # since some keys are deliberate prefixes ("trigonometr" -> "trigonometry"/"trigonometric").
+    return [n for n in pool if any(re.search(rf"\b{re.escape(k)}", t) for k in _template_keys(n))]
 
 
 def _pick_template(rng: random.Random, slot: Slot, strict: bool = False) -> MQ:

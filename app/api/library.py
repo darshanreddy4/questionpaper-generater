@@ -53,6 +53,7 @@ def meta(request: Request, user: User = Depends(current_user)):
         "difficulties": DIFFICULTIES, "blooms": BLOOMS,
         "languages": languages.catalogue(),
         "patterns": presets + custom_json,
+        "tenancy": state.settings.tenancy,
         "limits": {"max_upload_mb": state.settings.max_upload_mb, "extensions": sorted(ALLOWED_EXTENSIONS)},
     }
 
@@ -176,6 +177,7 @@ def list_bank(request: Request, subject: Optional[str] = None, q_type: Optional[
             content = {k: v for k, v in r.content.items() if k != "text_blob"}
             items.append({"id": r.id, "subject": r.subject, "topic": r.topic, "type": r.q_type,
                           "difficulty": r.difficulty, "marks": r.marks, "paper_id": r.paper_id, "question": content,
+                          "published": bool(r.published),
                           "created_by": names.get(r.owner_id, ""), "can_delete": user.role == "admin" or (not school_shared(state) and r.owner_id == user.id),
                           "created_at": r.created_at.isoformat() + "Z"})
         return {"total": total, "items": items}

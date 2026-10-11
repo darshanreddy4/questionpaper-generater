@@ -100,6 +100,8 @@ class Document(JobColumns, Base):
     message: Mapped[str] = mapped_column(Text, default="")
     stats: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
     stored_path: Mapped[str] = mapped_column(String(500), default="")
+    published: Mapped[bool] = mapped_column(Boolean, default=False)  # platform operator only: offered to every school
+    published_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(DateTime, default=_now)
 
     chunks: Mapped[List["Chunk"]] = relationship(
@@ -170,6 +172,8 @@ class BankQuestion(Base):
     language: Mapped[str] = mapped_column(String(40), default="en")  # "" on rows from before languages: English
     content: Mapped[Dict[str, Any]] = mapped_column(JSON)
     use_count: Mapped[int] = mapped_column(Integer, default=0)  # times reused in later papers
+    published: Mapped[bool] = mapped_column(Boolean, default=False)  # platform operator only: offered to every school
+    published_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(DateTime, default=_now)
 
 

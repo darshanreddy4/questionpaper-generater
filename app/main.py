@@ -13,7 +13,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy import text
 
 from app import __version__
-from app.api import ai, auth, documents, library, papers, platform, support as support_api
+from app.api import ai, auth, catalog, documents, library, papers, platform, support as support_api
 from app.config import Settings, load_settings
 from app.services.documents import process_document
 from app.services import tenancy
@@ -62,7 +62,7 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     if settings.cors_origins:
         app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=False,
                            allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type"])
-    for module in (auth, documents, papers, library, ai, platform, support_api):
+    for module in (auth, documents, papers, library, ai, platform, support_api, catalog):
         app.include_router(module.router)
 
     @app.get("/healthz", include_in_schema=False)

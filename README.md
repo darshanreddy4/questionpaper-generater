@@ -38,11 +38,27 @@ questions, add an AI key: each teacher or school can use their own, or the opera
 | **Number of schools** | One school per install. | Many schools and individual teachers on one install, each fully isolated: its own papers, source files, question bank and users. |
 | **Teachers' work** | Private: each teacher sees only their own papers and sources. The admin sees everything. | Shared inside a school: every teacher sees the school's papers, source files and bank. Edits stay with the author or the admin; only the admin can delete source files and bank questions. |
 | **Platform operator** | None. | Accounts in `EXAMFORGE_SUPERADMIN_EMAILS` get a Platform console: onboard schools, set fees and token prices per school, suspend a school, see usage and billing. They cannot see school content. |
+| **Platform library** | Not available. | The operator publishes source files and questions with a Publish button; every school and teacher can browse them under Platform library and add what they want to their own library as an independent copy. |
 | **Support access** | Not available. | A school admin can grant a time-limited, read-only support view. The operator can then open the school as support, and every item opened is written to the school's audit log. |
 | **Same in both modes** | AI key order (teacher key, school key, platform key, built-in writer), paper generation, PDF and Word export, Indian languages and password rules. | *(same)* |
 
 Use single when one school or college hosts its own copy. Use multi when you run one service for several schools
 and bill them.
+
+### Platform library (multi mode)
+
+The platform operator can publish content for every school.
+
+1. Sign in as the operator and upload files in **Source library** (or use the questions already in **Question bank**).
+2. Click **Publish** in front of a file or a question, or **Publish all shown** in the question bank. **Unpublish**
+   withdraws it.
+3. Every school and individual teacher sees it under **Platform library**. They click **Add to my library** (or **Add**
+   / **Add all matching** for questions) and it is copied into their own source library or question bank.
+
+A copy is independent: if you later unpublish or delete the original, schools that already added it keep their copy.
+Added files and questions follow the school's usual rules (everyone in the school can use them, only the administrator
+can delete them). Adding the same question twice is skipped. Only files that have finished processing can be
+published, and the operator can publish only items in the operator's own library, never a school's.
 
 ### Switching off individual sign-up (multi mode)
 

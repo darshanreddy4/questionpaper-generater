@@ -21,7 +21,8 @@ _CHUNK = 1024 * 1024
 
 def _doc_json(d: Document, detail: bool = False, by: str = "", can_delete: bool = True) -> dict:
     out = {"id": d.id, "filename": d.filename, "format": d.format, "status": d.status, "message": d.message,
-           "created_at": d.created_at.isoformat() + "Z", "uploaded_by": by, "can_delete": can_delete}
+           "created_at": d.created_at.isoformat() + "Z", "uploaded_by": by, "can_delete": can_delete,
+           "published": bool(d.published)}
     stats = d.stats or {}
     out["stats"] = {k: v for k, v in stats.items() if k != "chapters"}
     if detail:

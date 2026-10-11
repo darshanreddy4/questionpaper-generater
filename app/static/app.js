@@ -141,6 +141,7 @@
   function shell(active, html) {
     const u = EF.state.user, eng = EF.state.meta.engine;
     const nav = (u.support ? NAV.filter(([h]) => ['#/', '#/library', '#/bank'].includes(h)) : NAV).concat(u.role === 'admin' && !u.is_superadmin ? [['#/admin', 'Administration', '⚙']] : [])
+      .concat(EF.state.meta.tenancy === 'multi' && !u.is_superadmin ? [['#/catalog', 'Platform library', '✦']] : [])
       .concat(u.is_superadmin ? [['#/platform', 'Platform', '◆']] : [])
       .map(([h, l, i]) => `<a href="${h}" class="${active === h ? 'active' : ''}"><span>${i}</span>${l}</a>`).join('');
     $('#app').innerHTML = `<div class="shell"><aside class="side">
@@ -276,15 +277,20 @@
     ['dragover', 'dragenter'].forEach((n) => drop.addEventListener(n, (e) => { e.preventDefault(); drop.classList.add('over'); }));
     ['dragleave', 'drop'].forEach((n) => drop.addEventListener(n, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
     drop.addEventListener('drop', (e) => upload(e.dataTransfer.files));
+    const pub = EF.state.user.is_superadmin && EF.state.meta.tenancy === 'multi';
     async function draw() {
       const { documents } = await api('/documents');
       const el = $('#docs', main);
       if (!documents.length) { el.innerHTML = '<div class="empty">No documents yet.</div>'; return; }
       el.innerHTML = `<table class="t"><thead><tr><th>File</th><th>Status</th><th>Content</th><th>Added</th><th></th></tr></thead><tbody>${documents.map((d) =>
-        `<tr><td><b>${esc(d.filename)}</b><div class="muted small">${esc(d.format.toUpperCase())}${d.uploaded_by ? ' · added by ' + esc(d.uploaded_by) : ''}</div></td>
+        `<tr><td><b>${esc(d.filename)}</b><div class="muted small">${esc(d.format.toUpperCase())}${d.uploaded_by ? ' · added by ' + esc(d.uploaded_by) : ''}${d.published ? ' · <span class="badge ok">Published to all schools</span>' : ''}</div></td>
         <td>${statusBadge(d.status)}${d.message ? `<div class="small muted" style="max-width:340px">${esc(d.message)}</div>` : ''}</td>
         <td class="small">${d.status === 'ready' ? `${(d.stats.words || 0).toLocaleString()} words · ${d.stats.chunks || 0} passages${d.stats.figures ? ` · ${d.stats.figures} figures` : ''}${d.stats.ai_vision ? ' · <span class="badge">AI-read</span>' : ''}` : '—'}</td>
-        <td class="muted small">${when(d.created_at)}</td><td style="text-align:right">${d.can_delete ? `<button class="btn sm danger" data-del="${d.id}">Remove</button>` : '<span class="muted small">Administrator only</span>'}</td></tr>`).join('')}</tbody></table>${documents.some((d) => !d.can_delete) ? '<p class="muted small" style="margin:.7rem 0 0">Source files belong to your whole school. Everyone can use them; only your school administrator can remove them.</p>' : ''}`;
+        <td class="muted small">${when(d.created_at)}</td><td style="text-align:right">${pub && d.status === 'ready' ? `<button class="btn sm ${d.published ? '' : 'primary'}" data-pub="${d.id}" data-v="${!d.published}">${d.published ? 'Unpublish' : 'Publish'}</button> ` : ''}${d.can_delete ? `<button class="btn sm danger" data-del="${d.id}">Remove</button>` : '<span class="muted small">Administrator only</span>'}</td></tr>`).join('')}</tbody></table>${documents.some((d) => !d.can_delete) ? '<p class="muted small" style="margin:.7rem 0 0">Source files belong to your whole school. Everyone can use them; only your school administrator can remove them.</p>' : ''}`;
+      $$('[data-pub]', el).forEach((b) => (b.onclick = async () => {
+        try { await api('/catalog/publish', { method: 'POST', json: { kind: 'document', ids: [b.dataset.pub], published: b.dataset.v === 'true' } }); toast(b.dataset.v === 'true' ? 'Published to all schools' : 'Withdrawn from the platform library', 'ok'); draw(); }
+        catch (e) { toast(e.message, 'bad'); }
+      }));
       $$('[data-del]', el).forEach((b) => (b.onclick = async () => { if (!(await EF.confirm('Remove this document? It disappears for everyone in your school.', 'Remove'))) return; await api('/documents/' + b.dataset.del, { method: 'DELETE' }); draw(); }));
       if (documents.some((d) => ['queued', 'processing'].includes(d.status))) EF.after(draw, 1500);
     }
@@ -298,6 +304,11 @@
       <select id="bd" style="max-width:150px"><option value="">Any difficulty</option><option>easy</option><option>medium</option><option>hard</option></select>
       <select id="bt" style="max-width:200px"><option value="">Any type</option>${EF.state.meta.question_types.map((t) => `<option value="${t.id}">${esc(t.label)}</option>`).join('')}</select></div></div>
       <div id="bl" class="card" style="margin-top:1rem"><span class="spin"></span></div>`);
+    const pubq = EF.state.user.is_superadmin && EF.state.meta.tenancy === 'multi';
+    const setPub = async (ids, published) => {
+      try { await api('/catalog/publish', { method: 'POST', json: { kind: 'question', ids, published } }); toast(published ? 'Published to all schools' : 'Withdrawn from the platform library', 'ok'); draw(); }
+      catch (e) { toast(e.message, 'bad'); }
+    };
     const draw = async () => {
       const p = new URLSearchParams({ limit: 100 });
       if ($('#bq').value) p.set('topic', $('#bq').value); if ($('#bd').value) p.set('difficulty', $('#bd').value); if ($('#bt').value) p.set('q_type', $('#bt').value);
@@ -305,10 +316,13 @@
       const el = $('#bl', main);
       if (!items.length) { el.innerHTML = '<div class="empty">No questions match.</div>'; return; }
       EF.dgReset();
-      el.innerHTML = `<div class="muted small" style="margin-bottom:.5rem">${total} question(s)</div>` + items.map((it) =>
+      el.innerHTML = `<div class="row small" style="margin-bottom:.5rem"><span class="muted">${total} question(s)</span>${pubq ? `<button class="btn sm right" id="pubshown">${items.some((i) => !i.published) ? 'Publish' : 'Unpublish'} all shown (${items.length})</button>` : ''}</div>` + items.map((it) =>
         `<div style="padding:.7rem 0;border-bottom:1px solid var(--line)"><div class="row small"><span class="badge ${it.difficulty}">${it.difficulty}</span><span class="badge">${esc(it.type)}</span><span class="badge">${it.marks} marks</span>
-        <span class="muted">${esc(it.subject)} · ${esc(it.topic)}${it.created_by ? ' · by ' + esc(it.created_by) : ''}</span>${it.can_delete ? `<button class="btn sm danger right" data-del="${it.id}">Delete</button>` : ''}</div>
+        <span class="muted">${esc(it.subject)} · ${esc(it.topic)}${it.created_by ? ' · by ' + esc(it.created_by) : ''}</span>${it.published ? '<span class="badge ok">Published</span>' : ''}${pubq ? `<button class="btn sm ${it.published ? '' : 'primary'} right" data-pub="${it.id}" data-v="${!it.published}">${it.published ? 'Unpublish' : 'Publish'}</button>` : ''}${it.can_delete ? `<button class="btn sm danger right" data-del="${it.id}">Delete</button>` : ''}</div>
         <div style="margin-top:.35rem">${fmt(it.question.text)}</div></div>`).join('');
+      $$('[data-pub]', el).forEach((b) => (b.onclick = async () => { await setPub([b.dataset.pub], b.dataset.v === 'true'); }));
+      const pa = $('#pubshown', main);
+      if (pa) pa.onclick = () => setPub(items.map((i) => i.id), items.some((i) => !i.published));
       $$('[data-del]', el).forEach((b) => (b.onclick = async () => { await api('/bank/' + b.dataset.del, { method: 'DELETE' }); draw(); }));
       EF.enhance(el);
     };
@@ -397,6 +411,7 @@
       if (hash === '#/settings') return await EF.views.settings();
       if (hash === '#/admin') return await EF.views.admin();
       if (hash === '#/platform') return await EF.views.platform();
+      if (hash === '#/catalog') return await EF.views.catalog();
       const m = /^#\/paper\/([0-9a-f]+)$/.exec(hash);
       if (m) return await EF.views.paper(m[1]);
       location.hash = '#/';

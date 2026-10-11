@@ -177,8 +177,9 @@
         <label class="f" style="margin-top:.7rem">Who writes the questions
           <select id="wm"><option value="auto">Automatic (recommended)</option>
             <option value="code_only">Code only — no AI</option>
-            <option value="ai_all">AI writes everything</option></select>
-          <span class="muted small" style="font-weight:400">Automatic uses your question bank first, then code (exact maths, questions from your own text), and AI only where needed. Code-written questions use no AI tokens; you see the split before generating.</span></label>
+            <option value="ai_all">AI writes everything</option>
+            <option value="extract_source" ${wiz.docIds.length ? '' : 'disabled'}>Use the exact questions from my source document (no AI)</option></select>
+          <span class="muted small" style="font-weight:400">Automatic uses your question bank first, then code (exact maths, questions from your own text), and AI only where needed. Code-written questions use no AI tokens; you see the split before generating. “Use the exact questions” reproduces the numbered questions already printed in your uploaded document(s), word for word — pick this if you want the same paper, re-typeset, not new ones.</span></label>
         <label class="f" style="margin-top:.7rem">Extra instructions to the paper-setter<textarea id="extra" placeholder="e.g. Prefer real-life contexts; avoid questions on proofs; include one graph-based question">${esc(wiz.extra)}</textarea></label>
         <label class="check" style="margin-top:.6rem"><input type="checkbox" id="avoid" ${wiz.avoid ? 'checked' : ''}><span>Avoid repeating questions from my earlier papers</span></label>
         <label class="check" style="margin-top:.5rem"><input type="checkbox" id="reuse" ${wiz.reuse ? 'checked' : ''}><span>Reuse matching questions from my question bank first <span class="muted small">(no AI tokens for those)</span></span></label></div></div></div>`;
@@ -223,6 +224,14 @@
 
   function writersCard(wr) {
     if (!wr) return '';
+    if (wr.mode === 'extract_source') {
+      const chips = [`<span class="chip">🗃️ <b>${wr.bank}</b> from your bank</span>`, `<span class="chip">📄 <b>${wr.extracted}</b> copied from your document</span>`].join('');
+      const note = wr.unwritten
+        ? `${wr.unwritten} question(s) could not be matched to a numbered question in your source (with a printed answer key, for multiple choice) and will be left for you to write or fill from elsewhere.`
+        : 'Every question is copied verbatim from your uploaded document(s) — no AI tokens are used.';
+      return `<div class="card"><h2>Who will write the questions</h2><div class="chips">${chips}</div>
+        <div class="banner ${wr.unwritten ? 'warn' : 'info'}" style="margin:.7rem 0 0">${note}</div></div>`;
+    }
     const bill = { platform: 'AI tokens on the platform key are charged by usage.', byok: 'AI runs on your own key — billed by your AI provider, not by ExamForge.', none: '' }[wr.billing] || '';
     const chips = [`<span class="chip">🗃️ <b>${wr.bank}</b> from your bank</span>`, `<span class="chip">🧩 <b>${wr.code}</b> written by code (no tokens)</span>`,
       `<span class="chip">🤖 <b>${wr.ai}</b> written by AI</span>`].join('');

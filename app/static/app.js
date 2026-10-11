@@ -286,12 +286,20 @@
         `<tr><td><b>${esc(d.filename)}</b><div class="muted small">${esc(d.format.toUpperCase())}${d.uploaded_by ? ' · added by ' + esc(d.uploaded_by) : ''}${d.published ? ' · <span class="badge ok">Published to all schools</span>' : ''}</div></td>
         <td>${statusBadge(d.status)}${d.message ? `<div class="small muted" style="max-width:340px">${esc(d.message)}</div>` : ''}</td>
         <td class="small">${d.status === 'ready' ? `${(d.stats.words || 0).toLocaleString()} words · ${d.stats.chunks || 0} passages${d.stats.figures ? ` · ${d.stats.figures} figures` : ''}${d.stats.ai_vision ? ' · <span class="badge">AI-read</span>' : ''}` : '—'}</td>
-        <td class="muted small">${when(d.created_at)}</td><td style="text-align:right">${pub && d.status === 'ready' ? `<button class="btn sm ${d.published ? '' : 'primary'}" data-pub="${d.id}" data-v="${!d.published}">${d.published ? 'Unpublish' : 'Publish'}</button> ` : ''}${d.can_delete ? `<button class="btn sm danger" data-del="${d.id}">Remove</button>` : '<span class="muted small">Administrator only</span>'}</td></tr>`).join('')}</tbody></table>${documents.some((d) => !d.can_delete) ? '<p class="muted small" style="margin:.7rem 0 0">Source files belong to your whole school. Everyone can use them; only your school administrator can remove them.</p>' : ''}`;
+        <td class="muted small">${when(d.created_at)}</td><td style="text-align:right">
+        ${d.status === 'ready' ? `<button class="btn sm ghost" data-label="${d.id}" title="Ask AI to clean up this document's chapter titles once; reused free afterwards">Label chapters with AI</button> ` : ''}
+        ${pub && d.status === 'ready' ? `<button class="btn sm ${d.published ? '' : 'primary'}" data-pub="${d.id}" data-v="${!d.published}">${d.published ? 'Unpublish' : 'Publish'}</button> ` : ''}
+        ${d.can_delete ? `<button class="btn sm danger" data-del="${d.id}">Remove</button>` : '<span class="muted small">Administrator only</span>'}</td></tr>`).join('')}</tbody></table>${documents.some((d) => !d.can_delete) ? '<p class="muted small" style="margin:.7rem 0 0">Source files belong to your whole school. Everyone can use them; only your school administrator can remove them.</p>' : ''}`;
       $$('[data-pub]', el).forEach((b) => (b.onclick = async () => {
         try { await api('/catalog/publish', { method: 'POST', json: { kind: 'document', ids: [b.dataset.pub], published: b.dataset.v === 'true' } }); toast(b.dataset.v === 'true' ? 'Published to all schools' : 'Withdrawn from the platform library', 'ok'); draw(); }
         catch (e) { toast(e.message, 'bad'); }
       }));
       $$('[data-del]', el).forEach((b) => (b.onclick = async () => { if (!(await EF.confirm('Remove this document? It disappears for everyone in your school.', 'Remove'))) return; await api('/documents/' + b.dataset.del, { method: 'DELETE' }); draw(); }));
+      $$('[data-label]', el).forEach((b) => (b.onclick = async () => {
+        b.disabled = true; b.textContent = 'Labelling…';
+        try { const r = await api('/documents/' + b.dataset.label + '/chapters/ai', { method: 'POST' }); toast(`${r.chapters.length} chapter(s) identified`, 'ok'); }
+        catch (e) { toast(e.message, 'bad'); } finally { b.disabled = false; b.textContent = 'Label chapters with AI'; }
+      }));
       if (documents.some((d) => ['queued', 'processing'].includes(d.status))) EF.after(draw, 1500);
     }
     draw().catch((e) => toast(e.message, 'bad'));

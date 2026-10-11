@@ -20,6 +20,85 @@ python3 -m venv .venv
 The first person to register becomes the administrator. Everything is stored in `./data/` (SQLite) unless
 `EXAMFORGE_DATABASE_URL` points to PostgreSQL.
 
+## Setting up a fresh clone (step by step)
+
+Three things are **git-ignored** and will not exist right after `git clone` — you create them locally:
+
+| Not in git | What it is | How you get it |
+|---|---|---|
+| `.venv/` | The Python virtual environment | Created by `python -m venv .venv` below |
+| `.env` | Your machine's settings (tenancy mode, superadmin email, secret keys, AI key) | Copy `.env.example` -> `.env` and edit it. Optional: without it the app runs fine in single-school mode |
+| `data/` | SQLite database, uploaded documents, generated figures | Created automatically the first time you run the server |
+
+`.env.example` itself **is** committed (it's the template); only your personal `.env` is ignored, so every machine
+keeps its own secret keys and tenancy choice.
+
+### Windows (PowerShell)
+
+```powershell
+git clone <your-repo-url>
+cd questionpaper-generater
+
+# 1. Virtual environment
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# 2. Settings (optional for single-school mode; required for multi-school)
+Copy-Item .env.example .env
+notepad .env   # set EXAMFORGE_TENANCY, EXAMFORGE_SUPERADMIN_EMAILS, etc. if you want multi-school mode
+
+# 3. Run
+.\.venv\Scripts\python.exe run.py
+# -> http://127.0.0.1:8000
+```
+
+Open the URL, register the first account (it becomes the administrator, or the platform operator in multi-school
+mode if its email matches `EXAMFORGE_SUPERADMIN_EMAILS`), and you're set up.
+
+To stop and restart the server later:
+
+```powershell
+# find and stop whatever is listening on port 8000
+Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue |
+  Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }
+
+# start it again
+.\.venv\Scripts\python.exe run.py
+```
+
+### macOS / Linux (bash)
+
+```bash
+git clone <your-repo-url>
+cd questionpaper-generater
+
+python3 -m venv .venv
+.venv/bin/pip install --upgrade pip
+.venv/bin/pip install -r requirements.txt
+
+cp .env.example .env
+nano .env   # set EXAMFORGE_TENANCY, EXAMFORGE_SUPERADMIN_EMAILS, etc. if you want multi-school mode
+
+.venv/bin/python run.py   # http://127.0.0.1:8000
+```
+
+### Run the tests
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q tests
+```
+
+### Notes
+
+- Nothing in `data/` is shared between machines — a fresh clone always starts with an empty database and no
+  uploaded documents, even if you had papers generated on another machine.
+- `EXAMFORGE_SECRET_KEY` and `EXAMFORGE_ENCRYPTION_KEY` are generated randomly if left unset in `.env`, which means
+  sessions and any stored AI keys stop working every time the server restarts. Set them to fixed values (see the
+  "Multi-school service" section below) for anything other than quick local testing.
+- `OPENAI_API_KEY` (or an Anthropic key) in `.env` is optional. Without one, ExamForge still works end to end using
+  its built-in, non-AI writer (exact maths templates and questions built from your uploaded material).
+
 By default the app runs in single-school mode: the login page offers only "Sign in" and "Create account". For
 "Register a school" and "Join with code", copy `.env.example` to `.env` (git-ignored, one per machine) before starting;
 it turns on multi-school mode. Accounts and papers live in `./data/`, which is not in git, so a new machine starts empty.

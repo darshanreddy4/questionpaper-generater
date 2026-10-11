@@ -49,7 +49,7 @@
     return `<div class="qtext">${fmt(o.text)}</div>${dgImg(o.diagram)}${tableHtml(o.table)}${matchHtml(o.match)}${optionsHtml(o.options, o.answer && o.answer.correct_option, show)}${subsHtml(o.sub_questions, show)}
       ${show && !(o.sub_questions || []).length ? answerHtml(o.answer, o.options, total) : ''}`;
   }
-  const ORIGIN = { code: 'Written by code', bank: 'From your bank', model: 'Written by AI' };
+  const ORIGIN = { code: 'Written by code', bank: 'From your bank', model: 'Written by AI', source: 'Copied from your document' };
   const VERIFIED = { construction: 'Exact answer', source: 'From your material', checked: 'Answer checked', flagged: 'Check the answer' };
   function provenanceBadge(q) {
     const parts = [];

@@ -2,6 +2,7 @@ import pytest
 
 from app.exam.blueprint import build_blueprint, parse_syllabus_text
 from app.exam.normalize import QuestionInvalid, normalise_question, split_units
+from app.exam.normalize import _s as normalize_s
 from app.exam.patterns import PRESETS
 from app.exam.schema import GenerationRequest, Slot, TopicSpec
 from app.llm.base import extract_json
@@ -98,3 +99,31 @@ def test_extract_json_recovers_unescaped_latex_and_fences():
     assert extract_json('[{"a": "\\\\frac{1}{2}"}]')[0]["a"] == "\\frac{1}{2}"
     with pytest.raises(ValueError):
         extract_json("no json here")
+
+
+@pytest.mark.parametrize("raw,expected", [
+    (r"\frac{3}{8}", "$\\frac{3}{8}$"),
+    (r"(a) \frac{3}{8} (b) \frac{5}{8}", "(a) $\\frac{3}{8}$ (b) $\\frac{5}{8}$"),
+    (r"Already fine: $\frac{1}{2}$ done.", r"Already fine: $\frac{1}{2}$ done."),
+    (r"Simplify \sqrt{\frac{1}{4}}.", r"Simplify $\sqrt{\frac{1}{4}}$."),
+    (r"Evaluate \sqrt[3]{27}.", r"Evaluate $\sqrt[3]{27}$."),
+    (r"Solve x^2 + 3x - 4 = 0.", r"Solve $x^2$ + 3x - 4 = 0."),
+    (r"a_n = a_1 + (n-1)d.", r"$a_n$ = $a_1$ + (n-1)d."),
+    (r"\sum_{i=1}^{n} i", r"$\sum_{i=1}^{n}$ i"),
+    (r"\int_0^1 x^2 \, dx", r"$\int_0^1 x^2 \,$ dx"),
+    (r"A = \{1, 2, 3\} and B", r"A = $\{1, 2, 3\}$ and B"),
+    (r"\begin{vmatrix} 1 & 2 \\ 3 & 4 \end{vmatrix}", r"$\begin{vmatrix} 1 & 2 \\ 3 & 4 \end{vmatrix}$"),
+    ("See pages 10-12 for details.", "See pages 10-12 for details."),
+    ("This is a well-known result.", "This is a well-known result."),
+    ("Theorems I, II, III, IV and V are listed below.", "Theorems I, II, III, IV and V are listed below."),
+    ("", ""),
+])
+def test_wrap_bare_math_safety_net(raw, expected):
+    assert normalize_s(raw) == expected
+
+
+def test_wrap_bare_math_is_idempotent_and_handles_malformed_latex():
+    once = normalize_s(r"\frac{3}{8} and x^2")
+    assert normalize_s(once) == once
+    # an unterminated brace group must not crash or swallow the rest of the sentence
+    assert normalize_s(r"Simplify \frac{3}{8 and continue.").startswith("Simplify $\\frac{3}$")

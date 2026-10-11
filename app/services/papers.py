@@ -4,13 +4,15 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from app import languages
+from app.exam.extract_engine import ExtractEngine
 from app.exam.generator import BankItem, PaperGenerator, resolve_topics
 from app.exam.hybrid_engine import CodeOnlyEngine, HybridEngine
-from app.exam.llm_engine import LLMEngine
+from app.exam.llm_engine import LLMEngine, SlotJob
 from app.exam.normalize import question_text_blob
 from app.exam.offline_engine import OfflineEngine
 from app.exam.quality import text_hash
 from app.exam.schema import ExamPattern, GenerationRequest, PaperContent, Question
+from app.ingestion.question_extract import extract_from_chunks
 from app.ingestion.retrieval import Retriever
 from app.llm.usage import UsageMeter
 from app.models import AuditLog, BankQuestion, Paper, User
@@ -22,8 +24,12 @@ from app.state import AppState
 log = logging.getLogger("examforge.papers")
 
 
-def make_engine(state: AppState, seed: Optional[int], mode: str = "auto", resolved: Optional[ResolvedAI] = None):
-    """Pick the writer: code only (no AI), AI for everything, or the automatic bank -> code -> AI routing."""
+def make_engine(state: AppState, seed: Optional[int], mode: str = "auto", resolved: Optional[ResolvedAI] = None,
+                extracted_items: Optional[List[Dict[str, Any]]] = None):
+    """Pick the writer: code only (no AI), AI for everything, the source document's own questions verbatim, or
+    the automatic bank -> code -> AI routing."""
+    if mode == "extract_source":
+        return ExtractEngine(extracted_items or [])
     provider = resolved.provider if resolved else state.provider
     if provider.is_offline:
         return OfflineEngine(seed or 0)
@@ -88,8 +94,9 @@ def _build_generator(state: AppState, paper_id: str, owner_id: str, req: Generat
     topics = resolve_topics(req, document_chapters(state, req.document_ids))
     bank = _bank_texts(state, owner_id, req.subject, req.language) if req.avoid_repeats else []
     items = _bank_items(state, owner_id, req.subject, req.language) if req.reuse_bank else []
+    extracted = extract_from_chunks(chunks) if req.writer_mode == "extract_source" else None
     return PaperGenerator(
-        make_engine(state, req.seed, req.writer_mode, resolved), req, req.pattern, retriever, bank, topics,
+        make_engine(state, req.seed, req.writer_mode, resolved, extracted), req, req.pattern, retriever, bank, topics,
         workers=state.settings.llm_max_concurrency, meter=meter, bank_items=items,
         progress=lambda pct, msg: _update(state, paper_id, status="generating", progress=pct, message=msg))
 
@@ -162,6 +169,12 @@ def regenerate_question(state: AppState, paper: Paper, qid: str, instruction: st
         record_usage(state, paper.owner_id, "regenerate", paper.id, meter, resolved)
 
 
+def _estimate_extracted(slots, items: List[Dict[str, Any]]) -> int:
+    """How many slots ExtractEngine could actually fill, without touching the real pool."""
+    jobs = [SlotJob(slot=s) for s in slots]
+    return len(ExtractEngine(list(items)).write(None, jobs, {}))
+
+
 def estimate_writers(state: AppState, user_id: str, req: GenerationRequest, pattern: ExamPattern, slots, topics) -> Dict[str, Any]:
     """Preview of who will write each question, so cost is visible before anything is generated."""
     from app.exam.blueprint import is_math_subject
@@ -173,6 +186,15 @@ def estimate_writers(state: AppState, user_id: str, req: GenerationRequest, patt
     if req.reuse_bank:
         bank = find_bank_matches(slots, _bank_items(state, user_id, req.subject, req.language), req.seed if req.seed is not None else 7)
     rest = [s for s in slots if s.index not in bank]
+    if req.writer_mode == "extract_source":
+        chunks = load_chunks(state, req.document_ids)
+        extracted = _estimate_extracted(rest, extract_from_chunks(chunks))
+        return {
+            "mode": req.writer_mode, "questions": len(slots), "bank": len(bank), "code": 0, "ai": 0,
+            "extracted": extracted, "unwritten": len(rest) - extracted,
+            "ai_available": not resolved.provider.is_offline, "billing": "none", "source": resolved.source,
+            "uses_tokens": False, "language": None,
+        }
     code = 0
     if req.writer_mode != "ai_all" and languages.is_english(req.language):  # code writes English wording only
         if is_math_subject(req.subject):

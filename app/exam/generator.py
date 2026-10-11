@@ -266,6 +266,14 @@ class PaperGenerator:
         if not getattr(self.engine, "is_builtin", False) or self.retriever is None:
             return
         left_out = len(quality.get("failed") or [])
+        if self.request.writer_mode == "extract_source":
+            if left_out:
+                quality["warnings"].append(
+                    f"{left_out} question(s) could not be matched to a numbered question in your source material "
+                    "(objective types need a printed answer key) and are marked \"could not be generated\". Write "
+                    "them by hand, add more source material, or switch to Automatic/AI writing for the rest.")
+                quality["status"] = "review"
+            return
         note = ("The built-in writer (no AI connected) builds questions from sentences in your uploaded material"
                 " and cannot write new problems or worked solutions from it.")
         if left_out:
@@ -276,8 +284,8 @@ class PaperGenerator:
 
     def _language_report(self, quality: Dict[str, Any]) -> None:
         lang = languages.resolve(self.request.language)
-        if languages.is_english(self.request.language):
-            return
+        if languages.is_english(self.request.language) or self.request.writer_mode == "extract_source":
+            return  # extracted text keeps whatever language the source document itself is written in
         name = lang.name if lang else self.request.language
         quality["language"] = {"requested": name, "writer_can_write_it": bool(getattr(self.engine, "multilingual", True))}
         if not getattr(self.engine, "multilingual", True):

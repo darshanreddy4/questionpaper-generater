@@ -164,8 +164,10 @@ def create_paper(req: GenerationRequest, request: Request, user: User = Depends(
     pattern = _resolve_pattern(state, user, req)
     _check_documents(state, user, req.document_ids)
     enforce_budget(state, user.id)
+    if req.writer_mode == "extract_source" and not req.document_ids:
+        raise HTTPException(422, "Choose at least one source document to copy its exact questions from.")
     no_ai = resolve_ai(state, user.id).provider.is_offline or req.writer_mode == "code_only"
-    if no_ai and not req.document_ids and not re.search(
+    if no_ai and req.writer_mode != "extract_source" and not req.document_ids and not re.search(
             r"math|algebra|calculus|geometry|trigonometry|statistics", req.subject, re.I):
         raise HTTPException(422, "Without AI, ExamForge can only write from uploaded study material (or maths "
                                  "templates). Upload at least one document, or add an AI key under AI & billing.")

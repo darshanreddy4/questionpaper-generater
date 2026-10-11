@@ -228,14 +228,14 @@ class GenerationRequest(_Model):
     num_sets: int = Field(default=1, ge=1, le=4)
     seed: Optional[int] = None
     avoid_repeats: bool = True
-    writer_mode: str = "auto"  # auto | code_only | ai_all
+    writer_mode: str = "auto"  # auto | code_only | ai_all | extract_source
     reuse_bank: bool = False  # fill slots from the user's question bank before writing new questions
 
     @field_validator("writer_mode")
     @classmethod
     def _writer_mode(cls, v: str) -> str:
-        if v not in ("auto", "code_only", "ai_all"):
-            raise ValueError("writer_mode must be auto, code_only or ai_all")
+        if v not in ("auto", "code_only", "ai_all", "extract_source"):
+            raise ValueError("writer_mode must be auto, code_only, ai_all or extract_source")
         return v
 
     @field_validator("diagram_mode")

@@ -18,6 +18,147 @@ STANDARD_AR_OPTIONS = [
 _OPT_PREFIX = re.compile(r"^\s*\(?[A-Da-d1-4][\).:]\s+")
 _LETTERS = "ABCD"
 
+# Models are told to wrap LaTeX in $ ... $, but weaker ones sometimes forget. This scans for runs of genuine math
+# notation sitting outside an existing math delimiter -- LaTeX commands (\frac, \sqrt, \sum...), their nested
+# argument groups, escaped symbols (\{, \,, \%), and bare superscript/subscript like x^2 or a_n -- and wraps just
+# that stretch in $ ... $ so it renders instead of showing up as raw markup. Plain prose, digits, hyphenated
+# ranges ("pages 10-12") and isolated punctuation are left untouched.
+_MATH_DELIM = re.compile(r"\$\$.*?\$\$|\$.*?\$|\\\(.*?\\\)|\\\[.*?\\\]", re.S)
+_CMD = re.compile(r"\\[a-zA-Z]+")
+_NUM = re.compile(r"[0-9]+(?:\.[0-9]+)?")
+_SCRIPT_TOKEN = re.compile(r"[A-Za-z0-9]+")  # the exponent/subscript itself, e.g. the "2" in x^2 or "n" in a_n
+
+
+def _balanced(s: str, i: int, open_ch: str, close_ch: str) -> Optional[int]:
+    """s[i] == open_ch; returns the index just past the matching close_ch, or None if unbalanced."""
+    depth = 0
+    j = i
+    while j < len(s):
+        if s[j] == open_ch:
+            depth += 1
+        elif s[j] == close_ch:
+            depth -= 1
+            if depth == 0:
+                return j + 1
+        j += 1
+    return None
+
+
+def _consume_script(s: str, i: int) -> int:
+    """Advance past any chain of ^.../_... immediately following an atom, e.g. the "_{i=1}^{n}" in \\sum_{i=1}^{n}."""
+    n = len(s)
+    while i < n and s[i] in "^_":
+        i += 1
+        if i < n and s[i] == "{":
+            end = _balanced(s, i, "{", "}")
+            if end is None:
+                break
+            i = end
+        else:
+            m = _SCRIPT_TOKEN.match(s, i)
+            if not m:
+                break
+            i = m.end()
+    return i
+
+
+def _consume_atom(s: str, i: int) -> Optional[int]:
+    """One math 'atom' starting at s[i]: a command (with optional [..] / nested {..} args and an environment body),
+    an escaped symbol (\\{, \\,, \\%, ...), or a bare letter^/_script (x^2, a_n). None if s[i] starts none of these."""
+    n = len(s)
+    if i >= n:
+        return None
+    if s[i] == "\\":
+        m = _CMD.match(s, i)
+        if m:
+            name, j = m.group()[1:], m.end()
+            if j < n and s[j] == "[":
+                end = _balanced(s, j, "[", "]")
+                if end is not None:
+                    j = end
+            while j < n and s[j] == "{":
+                end = _balanced(s, j, "{", "}")
+                if end is None:
+                    break
+                j = end
+            if name == "begin" and j <= n:  # swallow the whole environment up to its matching \end{...}
+                tail = s.find("\\end{", j)
+                if tail != -1:
+                    end = s.find("}", tail)
+                    if end != -1:
+                        j = end + 1
+            return j
+        return i + 2 if i + 1 < n else None  # \{  \}  \,  \%  \\  etc.
+    if s[i].isalpha() and i + 1 < n and s[i + 1] in "^_":
+        return _consume_script(s, i + 1)
+    return None
+
+
+def _consume_run(s: str, i: int) -> Optional[int]:
+    """Greedily consume math atoms glued by operators/whitespace, starting at i. None if s[i] isn't a valid seed
+    (a bare digit or punctuation mark must never start a run on its own -- only a command or a scripted letter can).
+    Returns the end of the *last recognised atom*, never a trailing connector -- so a run never stops mid-atom
+    (e.g. splitting the escape "\\," in half) and never drags in unrelated trailing punctuation like "(b)"."""
+    n = len(s)
+    end = _consume_atom(s, i)
+    if end is None:
+        return None
+    last = j = _consume_script(s, end)
+    while j < n:
+        if s[j] == "\\" or (s[j].isalpha() and j + 1 < n and s[j + 1] in "^_"):
+            end = _consume_atom(s, j)
+            if end is None:
+                break
+            last = j = _consume_script(s, end)
+            continue
+        m = _NUM.match(s, j)
+        if m:
+            last = j = _consume_script(s, m.end())
+            continue
+        if s[j] in "+-*/=<>(),.":
+            j += 1
+            continue
+        if s[j].isspace():
+            k = j
+            while k < n and s[k].isspace():
+                k += 1
+            if k < n and (s[k] == "\\" or s[k].isdigit() or (s[k].isalpha() and k + 1 < n and s[k + 1] in "^_")):
+                j = k
+                continue
+        break
+    return last
+
+
+def _wrap_bare_math_segment(s: str) -> str:
+    out, i, n = [], 0, len(s)
+    while i < n:
+        end = _consume_run(s, i) if (s[i] == "\\" or s[i].isdigit() or
+                                      (s[i].isalpha() and i + 1 < n and s[i + 1] in "^_")) else None
+        if end is None:
+            out.append(s[i])
+            i += 1
+            continue
+        core = s[i:end]
+        if "\\" in core or re.search(r"[A-Za-z][\^_]", core):  # only wrap if it actually looks like a formula
+            out.append(f"${core}$")
+        else:
+            out.append(core)
+        i = end
+    return "".join(out)
+
+
+
+def _wrap_bare_math(text: str) -> str:
+    if not re.search(r"\\|[A-Za-z][\^_]", text):
+        return text
+    out, pos = [], 0
+    for m in _MATH_DELIM.finditer(text):
+        out.append(_wrap_bare_math_segment(text[pos:m.start()]))
+        out.append(m.group())
+        pos = m.end()
+    out.append(_wrap_bare_math_segment(text[pos:]))
+    return "".join(out)
+
 
 class QuestionInvalid(ValueError):
     """Raised with a message that is fed back to the model on retry."""
@@ -28,7 +169,7 @@ class VerificationFailed(QuestionInvalid):
 
 
 def _s(value: Any, limit: int = 6000) -> str:
-    return "" if value is None else str(value).strip()[:limit]
+    return "" if value is None else _wrap_bare_math(str(value).strip()[:limit])
 
 
 def split_units(total: float, weights: List[float]) -> List[float]:
